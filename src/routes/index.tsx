@@ -1,24 +1,27 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+// The demo page is the uploaded InkGuard frontend, served verbatim from
+// public/inkguard/index.html. "/" redirects straight to it.
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "InkGuard — Nothing ships that you can't prove" },
+      {
+        name: "description",
+        content:
+          "InkGuard checks ad copy against your approved brand rules and approved facts, and shows the page, the quote and the owner behind every flag.",
+      },
+      { property: "og:title", content: "InkGuard — Nothing ships that you can't prove" },
+      {
+        property: "og:description",
+        content:
+          "Paste the draft. Get the receipts: banned terms, conflicting numbers, expired facts — every finding with its proof.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  beforeLoad: () => {
+    throw redirect({ href: "/inkguard/index.html", replace: true });
+  },
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
