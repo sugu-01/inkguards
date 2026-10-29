@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>InkGuard — Nothing ships that you can’t prove</title>
+  <meta name="description"
+    content="InkGuard checks ad copy against your approved brand rules and approved facts, and shows the page, the quote and the owner behind every flag." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f3efe6;
+      --ink: #121212;
+      --red: #d3261b;
+      --amber: #b8780a;
+      --green: #1f7a4d;
+      --blue: #2552b8;
+      --rule: #121212;
+      --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .wrap {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* Masthead */
+    .mast {
+      border-bottom: 3px solid var(--rule);
+    }
+
+    .mast .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+      gap: 24px;
+    }
+
+    .brand {
+      font-weight: 900;
+      font-size: 26px;
+      letter-spacing: -.04em;
+      text-decoration: none;
+    }
+
+    .brand b {
+      color: var(--red);
+    }
+
+    .mast nav {
+      display: flex;
+      gap: 28px;
+    }
+
+    .mast nav a {
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .mast nav a:hover {
+      color: var(--red);
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--ink);
+      color: var(--paper);
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: .02em;
+      text-decoration: none;
+      padding: 14px 22px;
+      border: 2px solid var(--ink);
+      cursor: pointer;
+      font-family: var(--sans);
+      transition: background .15s, color .15s;
+    }
+
+    .btn:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .btn.ghost:hover {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 84px 0 72px;
+      border-bottom: 3px solid var(--rule);
+    }
+
+    .kicker {
+      color: var(--red);
+      margin-bottom: 26px;
+    }
+
+    h1 {
+      font-weight: 900;
+      font-size: clamp(54px, 10.5vw, 148px);
+      line-height: .9;
+      letter-spacing: -.055em;
+      max-width: 12ch;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(transparent 70%, var(--red) 70%, var(--red) 88%, transparent 88%);
+    }
+
+    .hero-foot {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 48px;
+      margin-top: 56px;
+      align-items: end;
+    }
+
+    .lede {
+      font-size: clamp(19px, 2.1vw, 25px);
+      line-height: 1.4;
+      font-weight: 500;
+      max-width: 34ch;
+    }
+
+    .cta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    /* Strip */
+    .strip {
+      background: var(--ink);
+      color: var(--paper);
+      overflow: hidden;
+    }
+
+    .strip .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 38px;
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    .strip span::before {
+      content: "■ ";
+      color: var(--red);
+    }
+
+    /* Sections */
+    section {
+      padding: 88px 0;
+      border-bottom: 3px solid var(--rule);
+    }
+
+    .sec-head {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+
+    h2 {
+      font-weight: 900;
+      font-size: clamp(36px, 5.6vw, 72px);
+      line-height: .95;
+      letter-spacing: -.045em;
+      max-width: 16ch;
+    }
+
+    .sec-head p.lead {
+      margin-top: 20px;
+      font-size: 19px;
+      max-width: 52ch;
+      font-weight: 500;
+    }
+
+    /* Checker */
+    .bench {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 3px solid var(--rule);
+      background: #fffdf8;
+    }
+
+    .pane {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .pane+.pane {
+      border-left: 3px solid var(--rule);
+      background: var(--paper);
+    }
+
+    .pane h3 {
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 230px;
+      resize: vertical;
+      font-family: var(--mono);
+      font-size: 15px;
+      line-height: 1.7;
+      background: transparent;
+      border: 0;
+      border-bottom: 2px dashed #9a948a;
+      color: var(--ink);
+      padding: 0 0 12px;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-bottom-color: var(--red);
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .status {
+      padding: 4px 8px;
+      border: 1.5px solid var(--ink);
+    }
+
+    .status.live {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+
+    .marked {
+      font-family: var(--mono);
+      font-size: 15px;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 96px;
+    }
+
+    mark {
+      color: inherit;
+      padding: 1px 2px;
+    }
+
+    mark.rule,
+    mark.conflict {
+      background: rgba(211, 38, 27, .2);
+      border-bottom: 3px solid var(--red);
+    }
+
+    mark.stale {
+      background: rgba(184, 120, 10, .2);
+      border-bottom: 3px solid var(--amber);
+    }
+
+    mark.unverified {
+      background: none;
+      border-bottom: 3px dotted #555;
+    }
+
+    mark.verified {
+      background: rgba(31, 122, 77, .18);
+      border-bottom: 3px solid var(--green);
+    }
+
+    mark.tone {
+      background: rgba(37, 82, 184, .15);
+      border-bottom: 3px solid var(--blue);
+    }
+
+    .summary {
+      margin: 18px 0 6px;
+    }
+
+    .find {
+      border-top: 2px solid var(--ink);
+      padding: 14px 0;
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      gap: 14px;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 3px 6px;
+      align-self: start;
+      text-align: center;
+      color: #fff;
+    }
+
+    .tag.rule,
+    .tag.conflict {
+      background: var(--red);
+    }
+
+    .tag.stale {
+      background: var(--amber);
+    }
+
+    .tag.unverified {
+      background: #555;
+    }
+
+    .tag.verified {
+      background: var(--green);
+    }
+
+    .tag.tone {
+      background: var(--blue);
+    }
+
+    .find p {
+      font-weight: 800;
+    }
+
+    .find small {
+      display: block;
+      font-family: var(--mono);
+      font-size: 12px;
+      margin-top: 6px;
+      color: #3d3a35;
+    }
+
+    .find .fix {
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .empty {
+      color: #5c574f;
+      font-weight: 500;
+    }
+
+    /* Principles */
+    .rules {
+      list-style: none;
+      border-top: 3px solid var(--rule);
+    }
+
+    .rules li {
+      display: grid;
+      grid-template-columns: 180px 1fr 1fr;
+      gap: 32px;
+      padding: 34px 0;
+      border-bottom: 3px solid var(--rule);
+    }
+
+    .rules .n {
+      font-weight: 900;
+      font-size: 64px;
+      line-height: .9;
+      letter-spacing: -.05em;
+      color: var(--red);
+    }
+
+    .rules h3 {
+      font-weight: 900;
+      font-size: 30px;
+      line-height: 1.05;
+      letter-spacing: -.03em;
+    }
+
+    .rules p {
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    /* Workflow (dark) */
+    .dark {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .dark h2 {
+      color: var(--paper);
+    }
+
+    .dark .sec-head p.lead {
+      color: #d8d3c7;
+    }
+
+    .roles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 3px solid var(--paper);
+    }
+
+    .role {
+      padding: 30px 26px 34px;
+    }
+
+    .role+.role {
+      border-left: 3px solid var(--paper);
+    }
+
+    .role .mono {
+      color: var(--red);
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .role h3 {
+      font-weight: 900;
+      font-size: 34px;
+      letter-spacing: -.035em;
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+
+    .role p {
+      font-weight: 500;
+      color: #d8d3c7;
+    }
+
+    .verdicts {
+      margin-top: 24px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .verdicts span {
+      border: 2px solid var(--paper);
+      padding: 6px 12px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    /* Close */
+    .close {
+      text-align: left;
+      border-bottom: 0;
+    }
+
+    .close h2 {
+      max-width: 14ch;
+      font-size: clamp(44px, 8vw, 110px);
+    }
+
+    .close .cta {
+      justify-content: flex-start;
+      margin-top: 40px;
+    }
+
+    footer {
+      border-top: 3px solid var(--rule);
+    }
+
+    footer .wrap {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-top: 22px;
+      padding-bottom: 28px;
+    }
+
+    @media (max-width: 880px) {
+      .mast nav {
+        display: none;
+      }
+
+      .hero-foot,
+      .sec-head,
+      .rules li,
+      .roles,
+      .bench {
+        grid-template-columns: 1fr;
+      }
+
+      .cta {
+        justify-content: flex-start;
+      }
+
+      .pane+.pane {
+        border-left: 0;
+        border-top: 3px solid var(--rule);
+      }
+
+      .role+.role {
+        border-left: 0;
+        border-top: 3px solid var(--paper);
+      }
+
+      .rules li {
+        gap: 12px;
+      }
+
+      .sec-head {
+        gap: 14px;
+      }
+
+      section {
+        padding: 64px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="mast">
+    <div class="wrap">
+      <a class="brand" href="#top">ink<b>guard</b></a>
+      <nav aria-label="Primary">
+        <a href="#check">Check text</a>
+        <a href="#method">Rules</a>
+        <a href="#workflow">Submissions</a>
+        <a href="#workflow">Audit trail</a>
+        <a href="#close">Insights</a>
+      </nav>
+      <a class="btn" href="#check">Run a check</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div class="wrap">
+        <p class="kicker mono">Brand &amp; copy control for teams that publish</p>
+        <h1>Nothing ships you can’t <em>prove.</em></h1>
+        <div class="hero-foot">
+          <p class="lede">Every line of ad copy gets checked against your approved rules and your approved facts. Every
+            flag shows its source: the page, the quote, the owner.</p>
+          <div class="cta">
+            <a class="btn" href="#check">Check your copy</a>
+            <a class="btn ghost" href="#method">See how it decides</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="strip mono">
+      <div class="wrap">
+        <span>Banned terms, caught</span>
+        <span>Numbers, matched to facts</span>
+        <span>Expired claims, flagged</span>
+        <span>Every decision, on record</span>
+      </div>
+    </div>
+
+    <!-- LIVE CHECKER -->
+    <section id="check">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="mono">01 — Try it</p>
+          <div>
+            <h2>Paste the draft. Get the receipts.</h2>
+            <p class="lead">This runs your real engine when the API is up. Otherwise it falls back to built-in sample
+              rules, and says so.</p>
+          </div>
+        </div>
+
+        <div class="bench">
+          <div class="pane">
+            <h3 class="mono"><span>The draft</span><span id="status" class="status mono">Checking API…</span></h3>
+            <textarea id="draft" spellcheck="false"
+              aria-label="Draft ad copy">Guaranteed results. Risk-free for everyone. Full refund within 14 days. Pay just INR 799 per month. Use DIWALI25 for 25% off. Trusted by 2 million customers.</textarea>
+            <div class="actions">
+              <button class="btn" id="run">Check this copy</button>
+              <button class="btn ghost" id="clear">Clear</button>
+            </div>
+          </div>
+          <div class="pane">
+            <h3 class="mono"><span>The verdict</span></h3>
+            <div id="marked" class="marked empty">Run a check to see your copy, marked up.</div>
+            <div id="summary" class="summary mono"></div>
+            <div id="findings"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- METHOD -->
+    <section id="method">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="mono">02 — The method</p>
+          <h2>Three rules we never bend.</h2>
+        </div>
+        <ol class="rules">
+          <li>
+            <span class="n">01</span>
+            <h3>A rule needs a page number.</h3>
+            <p>Rules are compiled from your brand-guideline PDF, with the exact line quoted. If the quote can’t be found
+              on that page, the rule is thrown out. Nothing is enforced until a brand manager approves it.</p>
+          </li>
+          <li>
+            <span class="n">02</span>
+            <h3>A number needs an owner.</h3>
+            <p>Every figure in your copy is matched to an approved fact with a named owner and an expiry date. It’s
+              verified, in conflict, stale, or unverified. And unverified isn’t false. We say exactly that.</p>
+          </li>
+          <li>
+            <span class="n">03</span>
+            <h3>The model proposes. Code decides.</h3>
+            <p>AI is limited to tone, it’s labelled, and it never blocks a deterministic finding. Any suggested fix is
+              re-run through every check and accepted only if it removes a problem without creating a new one.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section id="workflow" class="dark">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="mono">03 — The chain of custody</p>
+          <div>
+            <h2>Three roles. One record.</h2>
+            <p class="lead">Permissions are enforced on the server, not the screen. Every step lands in the audit trail.
+            </p>
+          </div>
+        </div>
+        <div class="roles">
+          <div class="role">
+            <span class="mono">Brand manager</span>
+            <h3>Owns the truth.</h3>
+            <p>Compiles rules from the guidelines, approves them, and maintains the facts the whole team checks against.
+            </p>
+          </div>
+          <div class="role">
+            <span class="mono">Creator</span>
+            <h3>Ships with proof.</h3>
+            <p>Checks copy before it leaves the desk, fixes what’s flagged, and submits it for review with the evidence
+              attached.</p>
+          </div>
+          <div class="role">
+            <span class="mono">Reviewer</span>
+            <h3>Makes the call.</h3>
+            <p>Sees every finding and its source, then records one decision.</p>
+            <div class="verdicts">
+              <span>Approved</span><span>Changes requested</span><span>Escalated</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSE -->
+    <section id="close" class="close">
+      <div class="wrap">
+        <p class="mono kicker">Before it goes live</p>
+        <h2>Stop proofreading. Start proving.</h2>
+        <div class="cta">
+          <a class="btn" href="#check">Check your copy</a>
+          <a class="btn ghost" href="#workflow">New submission</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap mono">
+      <span>InkGuard — Brand &amp; copy checker</span>
+      <span>Built to be audited</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // Point this at your FastAPI server (uvicorn main:app --port 8000).
+      var API = "/api";
+
+      // Sample data used only when the API is unreachable.
+      var RULES = [{ id: "R-01", page: 3, quote: "Never use: guaranteed, risk-free, cure", terms: ["guaranteed", "risk-free", "cure"] }];
+      var FACTS = [
+        { id: "F-01", kw: ["per month", "price"], val: 999, owner: "Finance", expires: "2026-12-31" },
+        { id: "F-02", kw: ["refund"], val: 14, owner: "Operations", expires: "2027-01-15" },
+        { id: "F-03", kw: ["diwali25"], val: 25, owner: "Marketing", expires: "2026-10-20" }
+      ];
+      var MULT = { million: 1e6, lakh: 1e5, k: 1e3 };
+      var LABEL = { rule: "Banned", conflict: "Conflict", stale: "Stale", unverified: "Unverified", verified: "Verified", tone: "Tone (AI)", inject: "Injection" };
+
+      function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+      function sentenceOf(t, p) {
+        var s = Math.max(t.lastIndexOf(".", p - 1), t.lastIndexOf("!", p - 1), t.lastIndexOf("?", p - 1)) + 1;
+        var e = t.slice(p).search(/[.!?]/);
+        return t.slice(s, e < 0 ? t.length : p + e + 1).toLowerCase();
+      }
+      function localCheck(text) {
+        var out = [], m, re;
+        RULES.forEach(function (r) {
+          r.terms.forEach(function (term) {
+            re = new RegExp("\\b" + term.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&") + "\\b", "gi");
+            while ((m = re.exec(text))) out.push({ kind: "rule", ref: r.id, start: m.index, end: m.index + m[0].length, message: "Banned term “" + m[0] + "”.", proof: r.id + ", page " + r.page + ": " + r.quote });
+          });
+        });
+        re = /\b(\d[\d,]*(?:\.\d+)?)\s*(million|lakh|k)?\+?/gi;
+        while ((m = re.exec(text))) {
+          var val = parseFloat(m[1].replace(/,/g, "")) * (MULT[(m[2] || "").toLowerCase()] || 1);
+          var sent = sentenceOf(text, m.index), s = m.index, e = m.index + m[0].length;
+          var f = FACTS.filter(function (x) { return x.kw.some(function (k) { return sent.indexOf(k) > -1; }); })[0];
+          if (!f) { out.push({ kind: "unverified", ref: "claim", start: s, end: e, message: "No approved fact on file. Unverified, not false." }); continue; }
+          var info = f.id + " · owner " + f.owner + " · expires " + f.expires;
+          if (new Date(f.expires) < new Date(new Date().toDateString())) out.push({ kind: "stale", ref: f.id, start: s, end: e, message: "Fact " + f.id + " has expired. " + f.owner + " should refresh it.", proof: info });
+          else if (val !== f.val) out.push({ kind: "conflict", ref: f.id, start: s, end: e, message: "Conflicts with " + f.id + " (approved value " + f.val.toLocaleString() + ").", proof: info, fix: String(f.val) });
+          else out.push({ kind: "verified", ref: f.id, start: s, end: e, message: "Matches " + f.id + ".", proof: info });
+        }
+        return out.sort(function (a, b) { return a.start - b.start; });
+      }
+
+      var $ = function (id) { return document.getElementById(id); };
+      var live = false;
+
+      function setStatus(isLive) {
+        live = isLive;
+        var el = $("status");
+        el.textContent = isLive ? "Live API" : "Sample rules";
+        el.className = "status mono" + (isLive ? " live" : "");
+      }
+
+      async function run() {
+        var text = $("draft").value, findings, ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 3000);
+        try {
+          var res = await fetch(API + "/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: text }), signal: ctl.signal });
+          if (!res.ok) throw new Error("bad status");
+          findings = (await res.json()).findings;
+          setStatus(true);
+        } catch (err) {
+          findings = localCheck(text);
+          setStatus(false);
+        }
+        clearTimeout(t);
+        render(text, findings);
+      }
+
+      function render(text, findings) {
+        var html = "", pos = 0, counts = {};
+        findings.forEach(function (f) {
+          counts[f.kind] = (counts[f.kind] || 0) + 1;
+          if (f.start < pos) return;
+          html += esc(text.slice(pos, f.start)) + '<mark class="' + f.kind + '">' + esc(text.slice(f.start, f.end)) + "</mark>";
+          pos = f.end;
+        });
+        html += esc(text.slice(pos));
+        var m = $("marked");
+        m.className = "marked";
+        m.innerHTML = text.trim() ? html : '<span class="empty">Nothing to check yet.</span>';
+        $("summary").textContent = findings.length ? Object.keys(counts).map(function (k) { return counts[k] + " " + LABEL[k].toLowerCase(); }).join("  ·  ") : "";
+        $("findings").innerHTML = findings.length ? findings.map(function (f) {
+          return '<div class="find"><span class="tag ' + f.kind + '">' + (LABEL[f.kind] || f.kind) + "</span><div><p>" + esc(f.message) + "</p>" +
+            (f.proof ? "<small>" + esc(f.proof) + "</small>" : "") +
+            (f.fix ? '<div class="fix">Suggested fix: <strong>' + esc(f.fix) + "</strong></div>" : "") + "</div></div>";
+        }).join("") : (text.trim() ? '<p class="empty">Clean. No findings.</p>' : "");
+      }
+
+      $("run").addEventListener("click", run);
+      $("clear").addEventListener("click", function () { $("draft").value = ""; $("marked").className = "marked empty"; $("marked").textContent = "Run a check to see your copy, marked up."; $("summary").textContent = ""; $("findings").innerHTML = ""; $("draft").focus(); });
+      run();
+    })();
+  </script>
+</body>
+
+</html>
+
+Claude finished the response
