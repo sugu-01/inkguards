@@ -105,7 +105,7 @@ function checkClaims(text: string, facts: BrandFact[]): Finding[] {
   const out: Finding[] = [];
   const re = /(\d[\d,]*\.?\d*)\s*(million|lakh|k)?\+?/gi;
   for (const m of text.matchAll(re)) {
-    const value = parseFloat(m[1].replace(/,/g, "")) * (MULT[(m[2] ?? "").toLowerCase()] ?? 1);
+    const value = parseFloat((m[1] ?? "").replace(/,/g, "")) * (MULT[(m[2] ?? "").toLowerCase()] ?? 1);
     const sent = sentenceOf(text, m.index);
     const fact = facts.find((f) => f.kw.some((k) => sent.includes(k)));
     const s = m.index;
